@@ -8,50 +8,39 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-const relatedProducts = [
-  {
-    id: "2",
-    name: "Traditional Adire Wrapper",
-    price: 18000,
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=600&fit=crop",
-    category: "Wrappers"
-  },
-  {
-    id: "3",
-    name: "Modern Adire Top",
-    price: 15000,
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=600&fit=crop",
-    category: "Tops"
-  },
-  {
-    id: "4",
-    name: "Adire Palazzo Pants",
-    price: 20000,
-    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=600&fit=crop",
-    category: "Bottoms"
-  },
-  {
-    id: "5",
-    name: "Elegant Adire Blouse",
-    price: 22000,
-    image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=400&h=600&fit=crop",
-    category: "Tops"
-  }
-];
-
-const productImages = [
-  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=600&h=800&fit=crop",
-  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=800&fit=crop",
-  "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=800&fit=crop",
-  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&h=800&fit=crop"
-];
+import { products } from "@/data/products";
 
 const Product = () => {
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
+
+  // Find the current product
+  const currentProduct = products.find(p => p.id === id);
+  
+  // Get related products (excluding current product)
+  const relatedProducts = products.filter(p => p.id !== id).slice(0, 4);
+
+  // Use the same image for all product views (as per typical e-commerce practice)
+  const productImages = currentProduct ? [
+    currentProduct.image,
+    currentProduct.image,
+    currentProduct.image,
+    currentProduct.image
+  ] : [];
+
+  if (!currentProduct) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <p>Product not found</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +53,7 @@ const Product = () => {
             <div className="aspect-square overflow-hidden rounded-lg bg-muted">
               <img
                 src={productImages[selectedImage]}
-                alt="Classic Indigo Adire Dress"
+                alt={currentProduct.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -91,7 +80,7 @@ const Product = () => {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Classic Indigo Adire Dress
+                {currentProduct.name}
               </h1>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
@@ -101,11 +90,11 @@ const Product = () => {
                 </div>
                 <span className="text-muted-foreground">(24 reviews)</span>
               </div>
-              <p className="text-3xl font-bold text-primary mb-4">₦25,000</p>
+              <p className="text-3xl font-bold text-primary mb-4">₦{currentProduct.price.toLocaleString()}</p>
             </div>
 
             <p className="text-muted-foreground leading-relaxed">
-              This beautiful classic indigo adire dress showcases traditional Nigerian craftsmanship. 
+              This beautiful {currentProduct.name.toLowerCase()} showcases traditional Nigerian craftsmanship. 
               Hand-dyed using ancient techniques, each piece features unique patterns that tell a story. 
               Perfect for special occasions or adding cultural elegance to your wardrobe.
             </p>
@@ -200,13 +189,13 @@ const Product = () => {
             <TabsContent value="description" className="mt-6">
               <div className="prose max-w-none text-muted-foreground">
                 <p>
-                  This exquisite adire dress represents the pinnacle of traditional Nigerian textile artistry. 
+                  This exquisite adire piece represents the pinnacle of traditional Nigerian textile artistry. 
                   Each piece is carefully hand-dyed using indigo plants, following techniques passed down through 
                   generations of skilled artisans.
                 </p>
                 <p className="mt-4">
                   The intricate patterns are created using resist-dyeing methods, including tie-dyeing and 
-                  stitch-resist techniques. No two pieces are exactly alike, making each dress a unique work of art.
+                  stitch-resist techniques. No two pieces are exactly alike, making each item a unique work of art.
                 </p>
                 <h4 className="text-foreground font-semibold mt-6 mb-2">Features:</h4>
                 <ul className="list-disc list-inside space-y-1">
@@ -253,7 +242,7 @@ const Product = () => {
                       </div>
                     </div>
                     <p className="text-muted-foreground">
-                      Beautiful dress with amazing quality. The adire patterns are stunning and the fabric 
+                      Beautiful piece with amazing quality. The adire patterns are stunning and the fabric 
                       feels luxurious. Perfect fit and exactly as described. Highly recommended!
                     </p>
                   </div>
