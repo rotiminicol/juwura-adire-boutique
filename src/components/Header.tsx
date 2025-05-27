@@ -11,9 +11,11 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <div className="text-2xl font-bold text-primary tracking-wider">
-              JUWURA
-            </div>
+            <img 
+              src="/lovable-uploads/f245d601-c91b-4996-bd82-51d2004de5ff.png" 
+              alt="JUWURA Logo" 
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Navigation */}
@@ -23,9 +25,6 @@ const Header = () => {
             </Link>
             <Link to="/categories" className="text-foreground hover:text-primary transition-colors">
               Collections
-            </Link>
-            <Link to="/categories" className="text-foreground hover:text-primary transition-colors">
-              Adire
             </Link>
             <Link to="/categories" className="text-foreground hover:text-primary transition-colors">
               New Arrivals

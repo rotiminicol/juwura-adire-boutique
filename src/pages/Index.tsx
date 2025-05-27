@@ -5,39 +5,11 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-
-const featuredProducts = [
-  {
-    id: "1",
-    name: "Classic Indigo Adire Dress",
-    price: 25000,
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=600&fit=crop",
-    category: "Dresses"
-  },
-  {
-    id: "2",
-    name: "Traditional Adire Wrapper",
-    price: 18000,
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=600&fit=crop",
-    category: "Wrappers"
-  },
-  {
-    id: "3",
-    name: "Modern Adire Top",
-    price: 15000,
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=600&fit=crop",
-    category: "Tops"
-  },
-  {
-    id: "4",
-    name: "Adire Palazzo Pants",
-    price: 20000,
-    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=600&fit=crop",
-    category: "Bottoms"
-  }
-];
+import { products } from "@/data/products";
 
 const Index = () => {
+  const featuredProducts = products.slice(0, 4);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -73,7 +45,7 @@ const Index = () => {
             </div>
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=600&h=800&fit=crop"
+                src="/lovable-uploads/a7ef2da9-2247-4f05-ba5c-efec7d892e59.png"
                 alt="Beautiful Adire Fashion"
                 className="rounded-lg shadow-2xl"
               />
