@@ -84,3 +84,29 @@
 .juwura-gradient {
   background: linear-gradient(135deg, #f5f1e8 0%, #ede7d4 100%);
 }
+
+/* Mobile responsive utilities */
+@layer utilities {
+  .container-responsive {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .text-responsive {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  .heading-responsive {
+    @apply text-xl sm:text-2xl lg:text-3xl xl:text-4xl;
+  }
+  
+  .grid-responsive {
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  button, a, input, select {
+    min-height: 44px;
+  }
+}

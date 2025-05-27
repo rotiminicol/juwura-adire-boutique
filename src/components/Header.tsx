@@ -1,5 +1,5 @@
 
-import { ShoppingBag, Search, Menu, User, Heart } from "lucide-react";
+import { ShoppingBag, Search, Menu, User, Heart, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,11 @@ import { useState } from "react";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Navigate to categories page with search query
       window.location.href = `/categories?search=${encodeURIComponent(searchQuery)}`;
     }
   };
@@ -23,32 +23,32 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <img 
-              src="/lovable-uploads/8a9c83d6-f6bf-4edc-8c55-e5d4c234022f.png" 
+              src="/lovable-uploads/f245d601-c91b-4996-bd82-51d2004de5ff.png" 
               alt="JUWURA Logo" 
-              className="h-12 w-auto"
+              className="h-8 w-auto sm:h-10 md:h-12"
             />
           </Link>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium text-sm xl:text-base">
               Home
             </Link>
-            <Link to="/categories" className="text-foreground hover:text-primary transition-colors font-medium">
+            <Link to="/categories" className="text-foreground hover:text-primary transition-colors font-medium text-sm xl:text-base">
               Collections
             </Link>
-            <Link to="/categories?filter=new" className="text-foreground hover:text-primary transition-colors font-medium">
+            <Link to="/categories?filter=new" className="text-foreground hover:text-primary transition-colors font-medium text-sm xl:text-base">
               New Arrivals
             </Link>
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex items-center flex-1 max-w-md mx-4 lg:mx-8">
             <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search for adire styles..."
-                className="pl-10 bg-muted border-border"
+                placeholder="Search adire styles..."
+                className="pl-10 bg-muted border-border text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -56,30 +56,101 @@ const Header = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
-            <Link to="/profile">
-              <Button variant="ghost" size="icon" className="hidden md:flex">
-                <User className="h-5 w-5" />
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Mobile Search */}
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Search className="h-4 w-4 sm:h-5 sm:w-5" />
+            </Button>
+            
+            {/* Desktop Icons */}
+            <Link to="/profile" className="hidden sm:block">
+              <Button variant="ghost" size="icon">
+                <User className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
-            <Link to="/wishlist">
-              <Button variant="ghost" size="icon" className="hidden md:flex">
-                <Heart className="h-5 w-5" />
+            <Link to="/wishlist" className="hidden sm:block">
+              <Button variant="ghost" size="icon">
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </Link>
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
-                <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-[10px] sm:text-xs">
                   2
                 </span>
               </Button>
             </Link>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
+            
+            {/* Mobile Menu Button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="lg:hidden"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden mt-4 pb-4 border-t border-border">
+            <nav className="flex flex-col space-y-4 mt-4">
+              <Link 
+                to="/" 
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/categories" 
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Collections
+              </Link>
+              <Link 
+                to="/categories?filter=new" 
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                New Arrivals
+              </Link>
+              <Link 
+                to="/profile" 
+                className="text-foreground hover:text-primary transition-colors font-medium sm:hidden"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+              <Link 
+                to="/wishlist" 
+                className="text-foreground hover:text-primary transition-colors font-medium sm:hidden"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Wishlist
+              </Link>
+            </nav>
+            
+            {/* Mobile Search */}
+            <div className="mt-4 md:hidden">
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search adire styles..."
+                    className="pl-10 bg-muted border-border"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
