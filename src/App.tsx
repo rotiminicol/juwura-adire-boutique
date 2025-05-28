@@ -13,6 +13,8 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
+import OrderHistory from "./pages/OrderHistory";
+import AccountSettings from "./pages/AccountSettings";
 import LearnAboutAdire from "./pages/LearnAboutAdire";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +36,8 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/order-history" element={<OrderHistory />} />
+              <Route path="/account-settings" element={<AccountSettings />} />
               <Route path="/learn-about-adire" element={<LearnAboutAdire />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

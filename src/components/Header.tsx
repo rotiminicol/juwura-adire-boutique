@@ -27,11 +27,14 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <div className="flex items-center space-x-2">
-              <img 
-                src="/lovable-uploads/a576361c-be72-4c7b-8a67-a671f55e29d3.png" 
-                alt="JUWURA" 
-                className="w-32 h-auto"
-              />
+              <div className="relative">
+                <img 
+                  src="/lovable-uploads/a576361c-be72-4c7b-8a67-a671f55e29d3.png" 
+                  alt="JUWURA" 
+                  className="w-36 h-auto filter brightness-110 contrast-110 saturate-110 hover:saturate-125 transition-all duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-orange-600/10 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
             </div>
           </Link>
 

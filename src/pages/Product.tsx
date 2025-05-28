@@ -1,7 +1,7 @@
 
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Minus, Plus, Heart, Share2, Star, Truck, Shield, RotateCcw } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Minus, Plus, Heart, Share2, Star, Truck, Shield, RotateCcw, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -9,12 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { products } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useToast } from "@/hooks/use-toast";
 
 const Product = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
 
   // Find the current product
   const currentProduct = products.find(p => p.id === id);
@@ -42,11 +49,85 @@ const Product = () => {
     );
   }
 
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast({
+        title: "Please select a size",
+        description: "You must select a size before adding to cart",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    for (let i = 0; i < quantity; i++) {
+      addToCart({
+        id: currentProduct.id,
+        name: currentProduct.name,
+        price: currentProduct.price,
+        image_url: currentProduct.image,
+        stock_quantity: 10 // Default stock for demo
+      });
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist(currentProduct.id)) {
+      removeFromWishlist(currentProduct.id);
+    } else {
+      addToWishlist({
+        id: currentProduct.id,
+        name: currentProduct.name,
+        price: currentProduct.price,
+        image_url: currentProduct.image,
+        category: currentProduct.category,
+        color: currentProduct.color
+      });
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: currentProduct.name,
+      text: `Check out this beautiful ${currentProduct.name} from JUWURA`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        // Fallback to copying to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          title: "Link copied",
+          description: "Product link has been copied to clipboard",
+        });
+      }
+    } else {
+      // Fallback to copying to clipboard
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied",
+        description: "Product link has been copied to clipboard",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Images */}
           <div className="space-y-4">
@@ -145,16 +226,21 @@ const Product = () => {
               <Button 
                 size="lg" 
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={!selectedSize}
+                onClick={handleAddToCart}
               >
                 Add to Cart
               </Button>
               <div className="flex space-x-4">
-                <Button variant="outline" size="lg" className="flex-1">
-                  <Heart className="h-5 w-5 mr-2" />
-                  Add to Wishlist
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="flex-1"
+                  onClick={handleWishlistToggle}
+                >
+                  <Heart className={`h-5 w-5 mr-2 ${isInWishlist(currentProduct.id) ? 'fill-current text-red-500' : ''}`} />
+                  {isInWishlist(currentProduct.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 </Button>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" onClick={handleShare}>
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>

@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Phone, MapPin, Package, Heart, Edit } from "lucide-react";
+import { User, Mail, Phone, MapPin, Package, Heart, Settings, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
@@ -156,18 +157,24 @@ const Profile = () => {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Package className="mr-2 h-4 w-4" />
-                    Order History
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Wishlist
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <User className="mr-2 h-4 w-4" />
-                    Account Settings
-                  </Button>
+                  <Link to="/order-history">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Package className="mr-2 h-4 w-4" />
+                      Order History
+                    </Button>
+                  </Link>
+                  <Link to="/wishlist">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Heart className="mr-2 h-4 w-4" />
+                      Wishlist
+                    </Button>
+                  </Link>
+                  <Link to="/account-settings">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Account Settings
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>
