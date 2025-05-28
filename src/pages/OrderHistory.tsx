@@ -4,7 +4,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Calendar, MapPin, CreditCard } from "lucide-react";
+import { Package, Calendar, MapPin } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Order {
   id: string;
@@ -14,42 +16,63 @@ interface Order {
   order_status: string;
   payment_status: string;
   shipping_address: any;
-  items: any[];
+  items?: any[];
 }
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // For now, we'll use mock data since we don't have user authentication
-    // In a real app, this would fetch from Supabase based on the logged-in user
-    const mockOrders: Order[] = [
-      {
-        id: "1",
-        order_number: "JUW-20241128-0001",
-        created_at: "2024-11-28T10:30:00Z",
-        total_amount: 45000,
-        order_status: "delivered",
-        payment_status: "paid",
-        shipping_address: {
-          street_address: "123 Lagos Street",
-          city: "Lagos",
-          state: "Lagos",
-          country: "Nigeria"
-        },
-        items: [
-          { name: "Blue Adire Kaftan", quantity: 1, unit_price: 45000 }
-        ]
-      }
-    ];
-    
-    // Simulate API delay
-    setTimeout(() => {
-      setOrders(mockOrders);
-      setLoading(false);
-    }, 1000);
+    fetchOrders();
   }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          created_at,
+          total_amount,
+          order_status,
+          payment_status,
+          shipping_address,
+          order_items (
+            quantity,
+            unit_price,
+            products (
+              name
+            )
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedOrders = data?.map(order => ({
+        ...order,
+        items: order.order_items?.map(item => ({
+          name: item.products?.name || 'Unknown Product',
+          quantity: item.quantity,
+          unit_price: item.unit_price
+        })) || []
+      })) || [];
+
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load order history",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -124,7 +147,7 @@ const OrderHistory = () => {
                           Items
                         </h4>
                         <div className="space-y-1">
-                          {order.items.map((item, index) => (
+                          {order.items?.map((item, index) => (
                             <p key={index} className="text-sm text-muted-foreground">
                               {item.quantity}x {item.name}
                             </p>
@@ -137,9 +160,9 @@ const OrderHistory = () => {
                           Shipping Address
                         </h4>
                         <div className="text-sm text-muted-foreground">
-                          <p>{order.shipping_address.street_address}</p>
-                          <p>{order.shipping_address.city}, {order.shipping_address.state}</p>
-                          <p>{order.shipping_address.country}</p>
+                          <p>{order.shipping_address?.street_address}</p>
+                          <p>{order.shipping_address?.city}, {order.shipping_address?.state}</p>
+                          <p>{order.shipping_address?.country}</p>
                         </div>
                       </div>
                     </div>

@@ -93,7 +93,7 @@ const ProductCard = ({ id, name, price, image, category, color }: ProductCardPro
             </p>
           )}
           <p className="text-lg font-semibold text-primary">
-            ₦{(price / 100).toLocaleString()}
+            ₦{price.toLocaleString()}
           </p>
         </div>
       </CardContent>

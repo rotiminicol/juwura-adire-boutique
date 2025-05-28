@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
+import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import Categories from "./pages/Categories";
 import Product from "./pages/Product";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/learn-about-adire" element={<LearnAboutAdire />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <CookieConsent />
           </BrowserRouter>
         </TooltipProvider>
       </WishlistProvider>

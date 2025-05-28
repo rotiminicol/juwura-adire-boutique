@@ -22,7 +22,7 @@ const Header = () => {
 
   return (
     <header className="w-full bg-background border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
@@ -31,7 +31,7 @@ const Header = () => {
                 <img 
                   src="/lovable-uploads/a576361c-be72-4c7b-8a67-a671f55e29d3.png" 
                   alt="JUWURA" 
-                  className="w-36 h-auto filter brightness-110 contrast-110 saturate-110 hover:saturate-125 transition-all duration-300"
+                  className="w-24 h-auto filter brightness-110 contrast-110 saturate-110 hover:saturate-125 transition-all duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-orange-600/10 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
               </div>
@@ -48,6 +48,9 @@ const Header = () => {
             </Link>
             <Link to="/categories?filter=new" className="text-foreground hover:text-primary transition-colors font-medium text-sm xl:text-base">
               New Arrivals
+            </Link>
+            <Link to="/learn-about-adire" className="text-foreground hover:text-primary transition-colors font-medium text-sm xl:text-base">
+              Learn About Adire
             </Link>
           </nav>
 
@@ -134,6 +137,13 @@ const Header = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 New Arrivals
+              </Link>
+              <Link 
+                to="/learn-about-adire" 
+                className="text-foreground hover:text-primary transition-colors font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Learn About Adire
               </Link>
               <Link 
                 to="/profile" 
