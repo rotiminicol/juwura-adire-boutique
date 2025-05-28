@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { totalItems } = useCart();
+  const { totalItems: wishlistTotal } = useWishlist();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +27,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm sm:text-base md:text-lg">J</span>
-              </div>
-              <span className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">JUWURA</span>
+              <img 
+                src="/lovable-uploads/a576361c-be72-4c7b-8a67-a671f55e29d3.png" 
+                alt="JUWURA" 
+                className="w-32 h-auto"
+              />
             </div>
           </Link>
 
@@ -72,8 +75,13 @@ const Header = () => {
               </Button>
             </Link>
             <Link to="/wishlist" className="hidden sm:block">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="relative">
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+                {wishlistTotal > 0 && (
+                  <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-[10px] sm:text-xs">
+                    {wishlistTotal}
+                  </span>
+                )}
               </Button>
             </Link>
             <Link to="/cart">

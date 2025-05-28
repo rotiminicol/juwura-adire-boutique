@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 interface ProductCardProps {
   id: string;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ id, name, price, image, category, color }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -27,6 +29,24 @@ const ProductCard = ({ id, name, price, image, category, color }: ProductCardPro
       image_url: image,
       stock_quantity: 10 // Default stock for demo
     });
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isInWishlist(id)) {
+      removeFromWishlist(id);
+    } else {
+      addToWishlist({
+        id,
+        name,
+        price,
+        image_url: image,
+        category,
+        color
+      });
+    }
   };
 
   return (
@@ -41,8 +61,15 @@ const ProductCard = ({ id, name, price, image, category, color }: ProductCardPro
             />
           </Link>
           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="secondary" size="icon" className="rounded-full bg-background/80 backdrop-blur-sm">
-              <Heart className="h-4 w-4" />
+            <Button 
+              variant="secondary" 
+              size="icon" 
+              className={`rounded-full bg-background/80 backdrop-blur-sm ${
+                isInWishlist(id) ? 'text-red-500' : ''
+              }`}
+              onClick={handleWishlistToggle}
+            >
+              <Heart className={`h-4 w-4 ${isInWishlist(id) ? 'fill-current' : ''}`} />
             </Button>
           </div>
           <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -2,11 +2,10 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 const Wishlist = () => {
-  // For demo, show first 4 products as wishlist items
-  const wishlistItems = products.slice(0, 4);
+  const { items } = useWishlist();
 
   return (
     <div className="min-h-screen bg-background">
@@ -16,10 +15,10 @@ const Wishlist = () => {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl font-bold text-foreground mb-8">My Wishlist</h1>
           
-          {wishlistItems.length > 0 ? (
+          {items.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {wishlistItems.map((product) => (
-                <ProductCard key={product.id} {...product} />
+              {items.map((product) => (
+                <ProductCard key={product.id} {...product} image={product.image} />
               ))}
             </div>
           ) : (
