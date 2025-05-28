@@ -31,7 +31,7 @@ serve(async (req) => {
     if (orderError) throw orderError;
 
     if (paymentMethod === 'stripe' && order.stripe_session_id) {
-      const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      const stripe = new Stripe("sk_test_51RTYVMDFLhUcauvGO95FHcJePXbWeWLZE7QTpAUOHfsk3Sr7iq95MviYEi18z4Pbj9yIkMBa1txIbK6QEQmFe1cF00Y5CterOm", {
         apiVersion: "2023-10-16",
       });
 

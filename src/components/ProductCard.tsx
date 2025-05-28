@@ -3,6 +3,7 @@ import { Heart, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   id: string;
@@ -10,9 +11,24 @@ interface ProductCardProps {
   price: number;
   image: string;
   category: string;
+  color?: string;
 }
 
-const ProductCard = ({ id, name, price, image, category }: ProductCardProps) => {
+const ProductCard = ({ id, name, price, image, category, color }: ProductCardProps) => {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      id,
+      name,
+      price,
+      image_url: image,
+      stock_quantity: 10 // Default stock for demo
+    });
+  };
+
   return (
     <Card className="group overflow-hidden bg-card border-border hover:shadow-lg transition-shadow duration-300">
       <CardContent className="p-0">
@@ -30,7 +46,7 @@ const ProductCard = ({ id, name, price, image, category }: ProductCardProps) => 
             </Button>
           </div>
           <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button size="icon" className="rounded-full bg-primary text-primary-foreground">
+            <Button size="icon" className="rounded-full bg-primary text-primary-foreground" onClick={handleAddToCart}>
               <ShoppingBag className="h-4 w-4" />
             </Button>
           </div>
@@ -44,8 +60,13 @@ const ProductCard = ({ id, name, price, image, category }: ProductCardProps) => 
               {name}
             </h3>
           </Link>
+          {color && (
+            <p className="text-xs text-muted-foreground mb-2">
+              Color: {color}
+            </p>
+          )}
           <p className="text-lg font-semibold text-primary">
-            ₦{price.toLocaleString()}
+            ₦{(price / 100).toLocaleString()}
           </p>
         </div>
       </CardContent>
