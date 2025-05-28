@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { totalItems } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +24,12 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img 
-              src="/lovable-uploads/f245d601-c91b-4996-bd82-51d2004de5ff.png" 
-              alt="JUWURA Logo" 
-              className="h-8 w-auto sm:h-10 md:h-12"
-            />
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm sm:text-base md:text-lg">J</span>
+              </div>
+              <span className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">JUWURA</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -76,9 +79,11 @@ const Header = () => {
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-[10px] sm:text-xs">
-                  2
-                </span>
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-[10px] sm:text-xs">
+                    {totalItems}
+                  </span>
+                )}
               </Button>
             </Link>
             
