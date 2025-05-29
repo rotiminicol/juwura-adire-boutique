@@ -14,70 +14,53 @@ serve(async (req) => {
   }
 
   try {
-    const { orderId, paymentMethod } = await req.json();
-    
+    const { sessionId } = await req.json();
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Get order details
-    const { data: order, error: orderError } = await supabaseClient
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2023-10-16",
+    });
+
+    // Retrieve the session from Stripe
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    // Update order status based on payment status
+    const paymentStatus = session.payment_status === 'paid' ? 'paid' : 'failed';
+    const orderStatus = session.payment_status === 'paid' ? 'confirmed' : 'cancelled';
+
+    const { data: order, error } = await supabaseClient
       .from('orders')
-      .select('*')
-      .eq('id', orderId)
+      .update({
+        payment_status: paymentStatus,
+        order_status: orderStatus,
+        stripe_payment_intent_id: session.payment_intent,
+        updated_at: new Date().toISOString()
+      })
+      .eq('stripe_session_id', sessionId)
+      .select()
       .single();
 
-    if (orderError) throw orderError;
+    if (error) throw error;
 
-    if (paymentMethod === 'stripe' && order.stripe_session_id) {
-      const stripe = new Stripe("sk_test_51RTYVMDFLhUcauvGO95FHcJePXbWeWLZE7QTpAUOHfsk3Sr7iq95MviYEi18z4Pbj9yIkMBa1txIbK6QEQmFe1cF00Y5CterOm", {
-        apiVersion: "2023-10-16",
-      });
-
-      const session = await stripe.checkout.sessions.retrieve(order.stripe_session_id);
-      
-      if (session.payment_status === 'paid') {
-        // Update order status
-        await supabaseClient
-          .from('orders')
-          .update({ 
-            payment_status: 'paid',
-            order_status: 'processing',
-            stripe_payment_intent_id: session.payment_intent
-          })
-          .eq('id', orderId);
-
-        // Update stock quantities
-        const { data: orderItems } = await supabaseClient
-          .from('order_items')
-          .select('product_id, quantity')
-          .eq('order_id', orderId);
-
-        for (const item of orderItems || []) {
-          await supabaseClient.rpc('update_product_stock', {
-            product_id: item.product_id,
-            quantity_sold: item.quantity
-          });
-        }
-
-        return new Response(
-          JSON.stringify({ status: 'paid', order }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-    }
-
-    return new Response(
-      JSON.stringify({ status: order.payment_status, order }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ 
+      success: true, 
+      order,
+      session_status: session.status,
+      payment_status: session.payment_status 
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
 
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    console.error('Error verifying payment:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });

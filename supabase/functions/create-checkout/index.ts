@@ -14,45 +14,93 @@ serve(async (req) => {
   }
 
   try {
-    const { items, customerInfo, shippingAddress, paymentMethod } = await req.json();
-    
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Create customer record
+    const { items, shippingData, paymentMethod, shippingMethodId } = await req.json();
+
+    // Calculate totals
+    const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    
+    // Get shipping cost
+    const { data: shippingMethod } = await supabaseClient
+      .from('shipping_methods')
+      .select('price')
+      .eq('id', shippingMethodId)
+      .single();
+
+    const shippingCost = shippingMethod?.price || 0;
+    const total = subtotal + shippingCost;
+
+    // Generate order number
+    const { data: orderNumber } = await supabaseClient.rpc('generate_order_number');
+
+    // Create customer
     const { data: customer, error: customerError } = await supabaseClient
       .from('customers')
       .insert({
-        email: customerInfo.email,
-        first_name: customerInfo.firstName,
-        last_name: customerInfo.lastName,
-        phone: customerInfo.phone
+        first_name: shippingData.firstName,
+        last_name: shippingData.lastName,
+        email: shippingData.email,
+        phone: shippingData.phone
       })
       .select()
       .single();
 
     if (customerError) throw customerError;
 
-    // Calculate total amount
-    const totalAmount = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    // Initialize Stripe
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2023-10-16",
+    });
 
-    // Generate order number
-    const { data: orderNumberData } = await supabaseClient.rpc('generate_order_number');
-    const orderNumber = orderNumberData;
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: items.map((item: any) => ({
+        price_data: {
+          currency: 'ngn',
+          product_data: {
+            name: item.name,
+            images: item.image_url ? [item.image_url] : [],
+          },
+          unit_amount: item.price, // Already in kobo
+        },
+        quantity: item.quantity,
+      })),
+      mode: 'payment',
+      success_url: `${req.headers.get("origin")}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/checkout`,
+      metadata: {
+        customer_id: customer.id,
+        order_number: orderNumber,
+        shipping_method_id: shippingMethodId,
+      },
+    });
 
-    // Create order
+    // Create order in database
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
       .insert({
         customer_id: customer.id,
         order_number: orderNumber,
-        total_amount: totalAmount,
-        payment_method: paymentMethod,
-        shipping_address: shippingAddress,
+        total_amount: total,
+        subtotal_amount: subtotal,
+        shipping_cost: shippingCost,
+        shipping_method_id: shippingMethodId,
+        payment_method: 'stripe',
         payment_status: 'pending',
-        order_status: 'processing'
+        order_status: 'processing',
+        stripe_session_id: session.id,
+        shipping_address: {
+          street_address: shippingData.address,
+          city: shippingData.city,
+          state: shippingData.state,
+          postal_code: shippingData.zipCode,
+          country: 'Nigeria'
+        }
       })
       .select()
       .single();
@@ -74,63 +122,16 @@ serve(async (req) => {
 
     if (itemsError) throw itemsError;
 
-    if (paymentMethod === 'stripe') {
-      const stripe = new Stripe("sk_test_51RTYVMDFLhUcauvGO95FHcJePXbWeWLZE7QTpAUOHfsk3Sr7iq95MviYEi18z4Pbj9yIkMBa1txIbK6QEQmFe1cF00Y5CterOm", {
-        apiVersion: "2023-10-16",
-      });
-
-      const session = await stripe.checkout.sessions.create({
-        line_items: items.map((item: any) => ({
-          price_data: {
-            currency: "ngn",
-            product_data: {
-              name: item.name,
-              images: [item.image]
-            },
-            unit_amount: item.price,
-          },
-          quantity: item.quantity,
-        })),
-        mode: "payment",
-        success_url: `${req.headers.get("origin")}/checkout/success?order_id=${order.id}`,
-        cancel_url: `${req.headers.get("origin")}/checkout/cancel?order_id=${order.id}`,
-        metadata: {
-          order_id: order.id,
-        },
-      });
-
-      // Update order with Stripe session ID
-      await supabaseClient
-        .from('orders')
-        .update({ stripe_session_id: session.id })
-        .eq('id', order.id);
-
-      return new Response(
-        JSON.stringify({ url: session.url, order_id: order.id }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    } else {
-      // Bank transfer payment
-      return new Response(
-        JSON.stringify({ 
-          order_id: order.id,
-          bank_details: {
-            bank_name: "Sparkle Bank",
-            account_number: "2324555254324",
-            account_name: "Juwura Adire",
-            amount: totalAmount / 100, // Convert from kobo to naira
-            reference: orderNumber
-          }
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    return new Response(JSON.stringify({ url: session.url }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
 
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    console.error('Error creating checkout:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });

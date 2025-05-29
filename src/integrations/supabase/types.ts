@@ -128,10 +128,88 @@ export type Database = {
           },
         ]
       }
+      order_reviews: {
+        Row: {
+          can_review: boolean | null
+          created_at: string | null
+          customer_id: string | null
+          id: string
+          order_id: string | null
+          review_deadline: string | null
+        }
+        Insert: {
+          can_review?: boolean | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          order_id?: string | null
+          review_deadline?: string | null
+        }
+        Update: {
+          can_review?: boolean | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          order_id?: string | null
+          review_deadline?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_status_history: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          notes: string | null
+          order_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string | null
           customer_id: string | null
+          discount_amount: number | null
           id: string
           notes: string | null
           order_number: string
@@ -139,8 +217,12 @@ export type Database = {
           payment_method: string
           payment_status: string | null
           shipping_address: Json
+          shipping_cost: number | null
+          shipping_method_id: string | null
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
+          subtotal_amount: number | null
+          tax_amount: number | null
           total_amount: number
           tracking_number: string | null
           updated_at: string | null
@@ -148,6 +230,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           customer_id?: string | null
+          discount_amount?: number | null
           id?: string
           notes?: string | null
           order_number: string
@@ -155,8 +238,12 @@ export type Database = {
           payment_method: string
           payment_status?: string | null
           shipping_address: Json
+          shipping_cost?: number | null
+          shipping_method_id?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          subtotal_amount?: number | null
+          tax_amount?: number | null
           total_amount: number
           tracking_number?: string | null
           updated_at?: string | null
@@ -164,6 +251,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           customer_id?: string | null
+          discount_amount?: number | null
           id?: string
           notes?: string | null
           order_number?: string
@@ -171,8 +259,12 @@ export type Database = {
           payment_method?: string
           payment_status?: string | null
           shipping_address?: Json
+          shipping_cost?: number | null
+          shipping_method_id?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          subtotal_amount?: number | null
+          tax_amount?: number | null
           total_amount?: number
           tracking_number?: string | null
           updated_at?: string | null
@@ -183,6 +275,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_shipping_method_id_fkey"
+            columns: ["shipping_method_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_methods"
             referencedColumns: ["id"]
           },
         ]
@@ -269,6 +368,100 @@ export type Database = {
           name?: string
           price?: number
           stock_quantity?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          customer_id: string | null
+          id: string
+          is_verified_purchase: boolean | null
+          order_id: string | null
+          product_id: string | null
+          rating: number
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          order_id?: string | null
+          product_id?: string | null
+          rating: number
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          order_id?: string | null
+          product_id?: string | null
+          rating?: number
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_methods: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          estimated_days: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          estimated_days?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          estimated_days?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
           updated_at?: string | null
         }
         Relationships: []
