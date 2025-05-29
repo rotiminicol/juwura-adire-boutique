@@ -29,7 +29,7 @@ const Checkout = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<string>("");
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([]);
   const [loading, setLoading] = useState(false);
-  const { items, getTotalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -71,7 +71,7 @@ const Checkout = () => {
     }
   };
 
-  const subtotal = getTotalPrice();
+  const subtotal = totalPrice;
   const selectedShipping = shippingMethods.find(m => m.id === selectedShippingMethod);
   const shippingCost = selectedShipping?.price || 0;
   const total = subtotal + shippingCost;
@@ -431,7 +431,7 @@ const Checkout = () => {
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3">
                     <img
-                      src={item.image_url}
+                      src={item.image}
                       alt={item.name}
                       className="w-16 h-20 object-cover rounded bg-muted"
                     />
