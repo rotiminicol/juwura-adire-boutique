@@ -1,6 +1,5 @@
 
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 
 const LearnAboutAdire = () => {
@@ -149,7 +148,6 @@ const LearnAboutAdire = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Calendar, MapPin } from "lucide-react";
@@ -100,7 +99,6 @@ const OrderHistory = () => {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -180,7 +178,6 @@ const OrderHistory = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

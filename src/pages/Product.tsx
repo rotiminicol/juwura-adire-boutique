@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Minus, Plus, Heart, Share2, Star, Truck, Shield, RotateCcw, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,7 +43,6 @@ const Product = () => {
         <div className="container mx-auto px-4 py-8">
           <p>Product not found</p>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -349,7 +347,6 @@ const Product = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

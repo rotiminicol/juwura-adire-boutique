@@ -2,7 +2,6 @@
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -142,8 +141,6 @@ const Cart = () => {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { useWishlist } from "@/contexts/WishlistContext";
 
@@ -30,7 +29,6 @@ const Wishlist = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };
